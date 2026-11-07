@@ -16,3 +16,10 @@ export async function POST(req:NextRequest){
  const {error}=await adminDb().from('managers').upsert({...details,pin_salt:hashed.salt,pin_hash:hashed.hash,is_active:true,updated_at:new Date().toISOString()},{onConflict:'slot'});
  return error?fail('Could not save manager',500):NextResponse.json({ok:true});
 }
+
+export async function DELETE(req:NextRequest){
+ const user=await currentUser(req);if(!user||user.role!=='admin')return fail('Forbidden',403);
+ const slot=Number(req.nextUrl.searchParams.get('slot'));if(![1,2].includes(slot))return fail('Valid manager slot required');
+ const {error}=await adminDb().from('managers').update({is_active:false,updated_at:new Date().toISOString()}).eq('slot',slot);
+ return error?fail('Could not deactivate manager',500):NextResponse.json({ok:true});
+}
