@@ -12,6 +12,5 @@ export async function PATCH(req:NextRequest,{params}:{params:Promise<{id:string}
  if(error||!profile)return fail('User not found',404);
  const updates={...parsed.data};const {error:updateError}=await db.from('profiles').update(updates).eq('id',id);
  if(updateError)return fail('Could not update user',500);
- if(parsed.data.is_active===false)await db.auth.admin.signOut(id,'global');
  return NextResponse.json({ok:true});
 }
