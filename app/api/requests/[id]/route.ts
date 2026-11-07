@@ -22,7 +22,7 @@ export async function PATCH(req:NextRequest,{params}:{params:Promise<{id:string}
  if(error||!managers||managers.length!==2||managers[0].slot!==1||managers[1].slot!==2)return fail('Both active manager slots must be configured',409);
  const base=process.env.APP_BASE_URL;if(!base)return fail('Application URL is not configured',503);
  const expires=new Date(Date.now()+14*24*60*60*1000).toISOString();
- const links=managers.map(m=>{const token=crypto.randomBytes(32).toString('hex');return {manager_slot:m.slot,manager_id:m.id,manager_name:m.full_name,manager_email:m.email,token_hash:crypto.createHash('sha256').update(token).digest('hex'),expires_at:expires,url:base.replace(/\\/$/,'')+'/approve/'+token};});
+ const links=managers.map(m=>{const token=crypto.randomBytes(32).toString('hex');return {manager_slot:m.slot,manager_id:m.id,manager_name:m.full_name,manager_email:m.email,token_hash:crypto.createHash('sha256').update(token).digest('hex'),expires_at:expires,url:base.replace(/\/$/,'')+'/approve/'+token};});
  const {error:rpcError}=await db.rpc('admin_amend_request',{p_request_id:id,p_campaign:payload.campaign,p_department:payload.department,p_objective:payload.objective,p_channels:payload.channels,p_start_date:payload.start_date,p_end_date:payload.end_date,p_amount:payload.amount,p_justification:payload.justification,p_approvals:links.map(({url,...x})=>x),p_actor:user.email});
  if(rpcError)return fail(rpcError.message.includes('Only pending')?'Only pending requests can be amended': 'Could not amend request',409);
  return NextResponse.json({ok:true,delivery:links.map(x=>({slot:x.manager_slot,name:x.manager_name,email:x.manager_email,url:x.url}))});
