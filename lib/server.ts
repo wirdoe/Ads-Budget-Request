@@ -15,8 +15,8 @@ export async function currentUser(req:NextRequest){
  if(!bearer.startsWith('Bearer '))return null;
  const db=adminDb();const {data,error}=await db.auth.getUser(bearer.slice(7));
  if(error||!data.user)return null;
- const {data:profile}=await db.from('profiles').select('id,role').eq('id',data.user.id).single();
- if(!profile)return null;
+ const {data:profile}=await db.from('profiles').select('id,role,is_active').eq('id',data.user.id).single();
+ if(!profile||profile.is_active===false)return null;
  return {id:data.user.id,role:profile.role,email:data.user.email||''};
 }
 export async function notification(to:string,subject:string,html:string){
