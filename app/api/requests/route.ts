@@ -16,7 +16,7 @@ export async function POST(req:NextRequest){
  const parsed=schema.safeParse(await req.json().catch(()=>null));if(!parsed.success)return fail('Complete all required fields with valid values');
  const payload=parsed.data;if(payload.end_date<payload.start_date)return fail('End date must be on or after start date');
  if(!process.env.APP_BASE_URL)return fail('Application URL is not configured. Contact the administrator.',503);
- const db=adminDb();const {data:managers,error:managersError}=await db.from('managers').select('*').order('slot');
+ const db=adminDb();const {data:managers,error:managersError}=await db.from('managers').select('*').eq('is_active',true).order('slot');
  if(managersError||!managers||managers.length!==2||managers[0].slot!==1||managers[1].slot!==2)return fail('Both managers must be configured by the administrator first',409);
  const {data:request,error}=await db.from('requests').insert({...payload,created_by:user.id,currency:'QAR'}).select('id,request_no').single();
  if(error||!request)return fail('Could not create request',500);
