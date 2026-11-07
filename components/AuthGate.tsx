@@ -1,0 +1,2 @@
+'use client';import {useEffect,useState} from 'react';import {useRouter} from 'next/navigation';import {publicDb} from '@/lib/supabase';
+export default function AuthGate({children}:{children:React.ReactNode}){const [ready,setReady]=useState(false);const router=useRouter();useEffect(()=>{let active=true;publicDb().auth.getSession().then(({data})=>{if(!active)return;if(!data.session)router.replace('/login');else setReady(true)});return()=>{active=false}},[router]);return ready?<>{children}</>:<main><p>Checking your session…</p></main>}

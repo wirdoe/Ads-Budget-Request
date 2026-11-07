@@ -1,0 +1,3 @@
+'use client';
+import Link from 'next/link';import {useRouter} from 'next/navigation';import {publicDb} from '@/lib/supabase';
+export default function Header({publicPage=false}:{publicPage?:boolean}){const router=useRouter();return <header><div className="inner"><Link href="/" className="brand">TARGET <span style={{fontWeight:400,color:'#9cb2cc'}}> / Ads Budget</span></Link>{!publicPage&&<nav><Link href="/">Requests</Link><Link href="/new">New request</Link><button className="btn" onClick={async()=>{await publicDb().auth.signOut();router.push('/login')}}>Sign out</button></nav>}</div></header>}
