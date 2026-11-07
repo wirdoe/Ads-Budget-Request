@@ -13,6 +13,5 @@ export async function PATCH(req:NextRequest,{params}:{params:Promise<{id:string}
  const updates={...parsed.data};const {error:updateError}=await db.from('profiles').update(updates).eq('id',id);
  if(updateError)return fail('Could not update user',500);
  if(parsed.data.is_active===false)await db.auth.admin.signOut(id,'global');
- await db.from('audit_events').insert({request_id:null,actor_type:'system',actor_label:actor.email,event_type:'user_access_changed',details:{user_id:id,changes:updates}});
  return NextResponse.json({ok:true});
 }
